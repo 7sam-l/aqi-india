@@ -36,6 +36,23 @@ def render_trend_chart(city):
     fig.add_hrect(y0=201, y1=300, fillcolor="red", opacity=0.1, layer="below", line_width=0)
     
     st.plotly_chart(fig, use_container_width=True)
+    
+    # Render best and worst day highlights
+    render_best_worst(df, city)
+
+def render_best_worst(city_df, city_name):
+    # Handle both column naming conventions
+    aqi_col = "aqi" if "aqi" in city_df.columns else "y"
+    date_col = "date" if "date" in city_df.columns else "ds"
+    
+    worst = city_df.loc[city_df[aqi_col].idxmax()]
+    best = city_df.loc[city_df[aqi_col].idxmin()]
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.error(f"🔴 Worst Day\n\n**{worst[date_col].strftime('%d %b %Y')}**\n\nAQI: {int(worst[aqi_col])}")
+    with col2:
+        st.success(f"🟢 Best Day\n\n**{best[date_col].strftime('%d %b %Y')}**\n\nAQI: {int(best[aqi_col])}")
 
 def render_forecast_chart(city):
     """
